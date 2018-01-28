@@ -46,9 +46,11 @@
                         <th>状态</th>
                         <th>创建时间</th>
                         <th>修改时间</th>
+                        <th>数据管理</th>
                         <th>操作</th>
                     </tr>
                     <tr>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -196,6 +198,13 @@
                             newDate = new Date();
                             newDate.setTime(data * 1000);
                             return newDate.toLocaleString('chinese',{hour12:false});
+                        }
+                    },
+                    {
+                        'data': 'encode_id',
+                        'orderable': false,
+                        render: function(data) {
+                            return '<a href="/home/table/data?id='+data+'"><button type="button" class="btn btn-sm btn-primary">数据管理</button></a>';
                         }
                     },
                     {

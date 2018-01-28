@@ -320,7 +320,7 @@ desired effect
                 </li>
 
                 <li class="treeview">
-                    <a href="{{url('/charts')}}"><i class="fa fa-cube text-red"></i> <span>图表站</span>
+                    <a href="{{url('/charts')}}" target="_blank"><i class="fa fa-cube text-red"></i> <span>图表站</span>
                         <span class="pull-right-container" style="display:none;">
                             <i class="fa fa-angle-left pull-right"></i>
                         </span>
