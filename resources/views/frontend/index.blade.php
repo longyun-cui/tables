@@ -23,7 +23,8 @@
         <div class="box box-warning">
 
             <div class="box-header with-border" style="margin:16px 0;">
-                <h3 class="box-title">chart 图表</h3>
+                <h3 class="box-title">{{$chart->title}}</h3>
+                <small>(来自 <a href="{{url('/u/'.$chart->user->id)}}" target="_blank">{{$chart->user->name}}</a> 的表：{{$chart->table->title}})</small>
             </div>
 
             <div class="box-body">

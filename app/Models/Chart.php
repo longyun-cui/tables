@@ -13,6 +13,11 @@ class Chart extends Model
     protected $dateFormat = 'U';
 
 
+    function user()
+    {
+        return $this->belongsTo('App\User','user_id','id');
+    }
+
     function table()
     {
         return $this->belongsTo('App\Models\Table','table_id','id');

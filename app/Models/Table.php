@@ -13,6 +13,11 @@ class Table extends Model
     protected $dateFormat = 'U';
 
 
+    function user()
+    {
+        return $this->belongsTo('App\User','user_id','id');
+    }
+
     function columns()
     {
         return $this->hasMany('App\Models\Column','table_id','id');

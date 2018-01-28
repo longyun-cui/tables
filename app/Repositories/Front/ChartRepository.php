@@ -76,12 +76,13 @@ class ChartRepository
     public function index()
     {
         $charts = Chart::with([
+            'user',
             'table' => function ($query) { $query->with([
                 'columns' => function ($query) { $query->orderBy('order', 'asc'); },
                 'rows' => function ($query) { $query->with(['contents']); }
             ]); },
             'formats' => function ($query) { $query->with(['column']); }
-        ])->get();
+        ])->orderBy('id', 'desc')->get();
 
         foreach($charts as $num => $chart)
         {
