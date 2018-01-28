@@ -29,6 +29,9 @@ Route::group(['prefix' => 'test'], function () {
     Route::get('/index', $controller.'@index');
 });
 
+    Route::get('admin/i18n', function () {
+        return trans('pagination.i18n');
+    });
 
     Route::match(['get','post'], 'login', 'AuthController@user_login');
     Route::match(['get','post'], 'logout', 'AuthController@user_logout');
