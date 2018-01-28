@@ -232,7 +232,11 @@
                 series: [{
                     name: '{{$chart->title or ""}}',
                     type: 'radar',
-                    // areaStyle: {normal: {}},
+                    areaStyle: {
+                        normal: {
+                            opacity: 0.4
+                        }
+                    },
                     data : [
                             @foreach($chart_datas->rows as $v)
                             @if (!$loop->last)
