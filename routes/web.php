@@ -15,9 +15,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test', function () {
-    return encode(2);
-});
 /*
  * TEST
  */
@@ -29,16 +26,22 @@ Route::group(['prefix' => 'test'], function () {
     Route::get('/index', $controller.'@index');
 });
 
-    Route::get('admin/i18n', function () {
-        return trans('pagination.i18n');
-    });
+/*
+ * auth
+ */
+Route::match(['get','post'], 'login', 'AuthController@user_login');
+Route::match(['get','post'], 'logout', 'AuthController@user_logout');
 
-    Route::match(['get','post'], 'login', 'AuthController@user_login');
-    Route::match(['get','post'], 'logout', 'AuthController@user_logout');
+
+Route::get('/', 'ChartController@index');
+Route::get('charts', 'ChartController@index');
+Route::get('chart', 'TableController@view_chart');
 
 
-    Route::get('chart', 'TableController@view_chart');
-    Route::get('charts', 'ChartController@index');
+Route::get('admin/i18n', function () {
+    return trans('pagination.i18n');
+});
+
 
 /*
  * Home Backend

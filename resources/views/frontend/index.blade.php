@@ -80,7 +80,7 @@
                 toolbox: {
                     feature: {
                         dataView: {show: true, readOnly: false},
-                        magicType: {show: true, type: ['line', 'bar']},
+                        magicType: {show: true, type: ['line', 'bar', 'tiled', 'stack']},
                         restore: {show: true},
                         saveAsImage: {show: true}
                     }
@@ -115,6 +115,7 @@
                         {
                             name : '{{$v->column->title}}',
                             type: @if($chart->type == 1) 'line' @elseif($chart->type == 2) 'bar' @endif ,
+                            label: 'labelOption',
                             data : [
                                 @foreach($chart->chart_datas->rows as $val)
                                 @if (!$loop->last) {{$val->datas[$k]->content}},
@@ -127,6 +128,7 @@
                         {
                             name : '{{$v->column->title}}',
                             type: @if($chart->type == 1) 'line' @elseif($chart->type == 2) 'bar' @endif ,
+                            label: 'labelOption',
                             data : [
                                 @foreach($chart->chart_datas->rows as $val)
                                 @if (!$loop->last) {{$val->datas[$k]->content}},
