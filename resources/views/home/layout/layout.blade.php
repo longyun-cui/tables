@@ -319,6 +319,14 @@ desired effect
                     </a>
                 </li>
 
+                <li class="treeview">
+                    <a href="{{url('/charts')}}"><i class="fa fa-plus text-red"></i> <span>图标站</span>
+                        <span class="pull-right-container" style="display:none;">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                </li>
+
 
             </ul>
             <!-- /.sidebar-menu -->
