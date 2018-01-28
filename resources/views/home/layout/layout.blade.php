@@ -304,7 +304,7 @@ desired effect
                 <li class="header">表格管理</li>
 
                 <li class="treeview">
-                    <a href="{{url('/home/table/list')}}"><i class="fa fa-cube text-red"></i> <span>表格管理</span>
+                    <a href="{{url('/home/table/list')}}"><i class="fa fa-table text-red"></i> <span>表格管理</span>
                         <span class="pull-right-container" style="display:none;">
                             <i class="fa fa-angle-left pull-right"></i>
                         </span>
@@ -320,7 +320,7 @@ desired effect
                 </li>
 
                 <li class="treeview">
-                    <a href="{{url('/charts')}}"><i class="fa fa-plus text-red"></i> <span>图标站</span>
+                    <a href="{{url('/charts')}}"><i class="fa fa-cube text-red"></i> <span>图表站</span>
                         <span class="pull-right-container" style="display:none;">
                             <i class="fa fa-angle-left pull-right"></i>
                         </span>
