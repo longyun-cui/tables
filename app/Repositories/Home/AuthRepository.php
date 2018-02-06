@@ -86,7 +86,7 @@ class AuthRepository {
                         if(empty($response)) throw new Exception('curl get request failed');
                         else
                         {
-                            $response = json_decode($response,true);
+                            $response = json_decode($response);
                             if(!$response['success']) throw new Exception("send-email-failed");
                         }
                     }
