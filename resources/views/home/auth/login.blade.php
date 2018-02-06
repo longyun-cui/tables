@@ -5,11 +5,11 @@
 @section('content')
 <div class="login-box">
     <div class="login-logo">
-        <a href="/admin"><b>图标站</b> 用户登录</a>
+        <a href="/admin"><b>图标站</b> </a>
     </div>
     <!-- /.login-logo -->
     <div class="login-box-body">
-        <p class="login-box-msg">管理员登陆</p>
+        <p class="login-box-msg">用户登录</p>
 
         <form action="/admin/login" method="post" id="form-admin-login">
             {{ csrf_field() }}
@@ -45,7 +45,7 @@
         <!-- /.social-auth-links -->
 
         <a href="#">忘记密码</a><br>
-        <a href="/admin/register" class="text-center">注册新用户</a>
+        <a href="/register" class="text-center">注册新用户</a>
 
     </div>
     <!-- /.login-box-body -->

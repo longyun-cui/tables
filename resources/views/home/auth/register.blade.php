@@ -1,44 +1,26 @@
-@extends('admin.layout.auth')
+@extends('home.layout.auth')
 
 @section('title','注册')
 
 @section('content')
 <div class="register-box">
     <div class="register-logo">
-        <a href="/admin"><b>Softorg</b> 注册</a>
+        <a href="/admin"><b>图表站</b> 注册</a>
     </div>
 
     <div class="register-box-body">
-        <p class="login-box-msg">注册一个机构</p>
+        <p class="login-box-msg">用户注册</p>
 
-        <form action="" method="post" id="form-admin-register">
+        <form action="" method="post" id="form-register">
 
             {{ csrf_field() }}
 
-
             <div class="form-group has-feedback">
-                <select class="form-control" name="type">
-                    <option value="5">企业</option>
-                    <option value="11">个人用户</option>
-                    <option value="19">个体工商户</option>
-                    <option value="1">机关单位</option>
-                    <option value="3">事业单位</option>
-                    <option value="7">社会团体</option>
-                    <option value="9">其他组织机构</option>
-                    <option value="0">暂不选择</option>
-                </select>
+                <input type="text" class="form-control" name="name" placeholder="用户名">
                 <span class="glyphicon glyphicon-user form-control-feedback"></span>
             </div>
             <div class="form-group has-feedback">
-                <input type="text" class="form-control" name="name" placeholder="机构全称">
-                <span class="glyphicon glyphicon-user form-control-feedback"></span>
-            </div>
-            <div class="form-group has-feedback">
-                <input type="text" class="form-control" name="website_name" placeholder="机构域名，唯一标识，仅限英文字符">
-                <span class="glyphicon glyphicon-font form-control-feedback"></span>
-            </div>
-            <div class="form-group has-feedback">
-                <input type="email" class="form-control" name="email" placeholder="超级管理员邮箱">
+                <input type="email" class="form-control" name="email" placeholder="邮箱">
                 <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
             </div>
             <div class="form-group has-feedback">
@@ -63,7 +45,7 @@
                 </div>
                 <!-- /.col -->
                 <div class="col-xs-4">
-                    <button type="button" class="btn btn-primary btn-block btn-flat" id="admin-register-submit">注册</button>
+                    <button type="button" class="btn btn-primary btn-block btn-flat" id="register-submit">注册</button>
                 </div>
                 <!-- /.col -->
             </div>
@@ -75,7 +57,7 @@
             <a href="#" class="btn btn-block btn-social btn-google btn-flat"><i class="fa fa-google-plus"></i> 支付宝登陆</a>
         </div>
 
-        <a href="/admin/login" class="text-center">返回登陆</a>
+        <a href="/login" class="text-center">返回登陆</a>
     </div>
     <!-- /.form-box -->
 </div>
@@ -92,9 +74,10 @@
         });
 
         // 提交表单
-        $("#admin-register-submit").on('click', function() {
+        $("#register-submit").on('click', function() {
+            var form = $("#form-register");
             var options = {
-                url: "/admin/register/org",
+                url: "/register",
                 type: "post",
                 dataType: "json",
                 // target: "#div2",
@@ -103,14 +86,14 @@
                     else
                     {
                         layer.msg(data.msg);
-                        $("#form-admin-register").find('input').val('');
+                        form.find('input').val('');
 
                     }
                     $('input[name=captcha]').val('');
-                    $("#form-admin-register .change_captcha").click();
+                    form.find(".change_captcha").click();
                 }
             };
-            $("#form-admin-register").ajaxSubmit(options);
+            form.ajaxSubmit(options);
         });
 
         // 更换验证码

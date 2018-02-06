@@ -25,10 +25,7 @@ class AuthController extends Controller
     // 登陆
     public function user_login()
     {
-        if(request()->isMethod('get'))
-        {
-            return view('home.auth.login');
-        }
+        if(request()->isMethod('get')) return view('home.auth.login');
         else if(request()->isMethod('post'))
         {
             $where['email'] = request()->get('email');
@@ -68,26 +65,19 @@ class AuthController extends Controller
     }
 
     // 注册
-    public function register()
+    public function user_register()
     {
-        if(request()->isMethod('get'))
-        {
-            return view('admin.auth.register');
-        }
+        if(request()->isMethod('get')) return view('home.auth.register');
         else if(request()->isMethod('post'))
         {
+            return $this->repo->register(request()->all());
         }
     }
 
-    // 注册新机构
-    public function register_org()
-    {
-        return $this->repo->register_org(request()->all());
-    }
-
+    // 激活用户
     public function activation()
     {
-        return $this->repo->activation(request()->all());
+        $this->repo->activation(request()->all());
     }
 
 

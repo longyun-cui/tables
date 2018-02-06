@@ -31,6 +31,16 @@ Route::group(['prefix' => 'test'], function () {
  */
 Route::match(['get','post'], 'login', 'AuthController@user_login');
 Route::match(['get','post'], 'logout', 'AuthController@user_logout');
+Route::match(['get','post'], 'register', 'AuthController@user_register');
+Route::match(['get','post'], 'email/activation', 'AuthController@activation');
+
+/*Common 通用功能*/
+Route::group(['prefix' => 'common'], function () {
+
+    $controller = "CommonController";
+
+    Route::match(['get','post'], 'change_captcha', $controller.'@change_captcha');
+});
 
 
 Route::get('/', 'ChartController@index');
