@@ -99,9 +99,9 @@ class AuthRepository {
             catch (Exception $e)
             {
                 DB::rollback();
-//                $msg = $e->getMessage();
+                $msg = $e->getMessage();
 //                exit($e->getMessage());
-                return response_fail([],'注册失败！');
+                return response_fail([],$msg);
             }
         }
         else return response_error([],'密码不一致！');
