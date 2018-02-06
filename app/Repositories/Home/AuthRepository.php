@@ -19,10 +19,10 @@ class AuthRepository {
     public function register($post_data)
     {
         $messages = [
+            'name.required' => '请填写用户名',
             'captcha.required' => '请输入验证码',
             'captcha.captcha' => '验证码有误',
-            'name.required' => '请填写用户名',
-            'email.unique' => '管理员邮箱已存在，请更换邮箱',
+            'email.unique' => '邮箱已存在，请更换邮箱',
         ];
         $v = Validator::make($post_data, [
             'captcha' => 'required|captcha',
@@ -74,7 +74,7 @@ class AuthRepository {
                         $post_data['code'] = $code;
                         $post_data['target'] = $email;
 
-                        $url = 'http://liv2.pub:8088/table/email/activation';
+                        $url = 'http://live2.pub:8088/table/email/activation';
                         $ch = curl_init();
                         curl_setopt($ch, CURLOPT_URL, $url);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
