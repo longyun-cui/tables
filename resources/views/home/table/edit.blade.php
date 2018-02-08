@@ -49,14 +49,14 @@
 
                 {{--名称--}}
                 <div class="form-group">
-                    <label class="control-label col-md-2">表格后台名称</label>
+                    <label class="control-label col-md-2">表格后台名称 <span class="text-red">*</span></label>
                     <div class="col-md-8 ">
                         <div><input type="text" class="form-control" name="name" placeholder="请输入名称" value="{{$data->name or ''}}"></div>
                     </div>
                 </div>
                 {{--标题--}}
                 <div class="form-group">
-                    <label class="control-label col-md-2">标题</label>
+                    <label class="control-label col-md-2">标题 <span class="text-red">*</span></label>
                     <div class="col-md-8 ">
                         <div><input type="text" class="form-control" name="title" placeholder="请输入标题" value="{{$data->title or ''}}"></div>
                     </div>
@@ -117,6 +117,8 @@
             <div class="box-header with-border" style="margin:16px 0;">
                 <h3 class="box-title">列管理</h3>
                 <div class="box-tools pull-right">
+                    <a href="{{ url('home/table/data?id='.$encode_id) }}">
+                        <button type="button" onclick="" class="btn btn-success pull-right"><i class="fa fa-edit"></i> 数据管理</button></a>
                 </div>
                 <input type="hidden" id="column-marking" data-key="1000">
             </div>
@@ -147,20 +149,20 @@
                             </div>
                             {{--标题--}}
                             <div class="form-group">
+                                {{--<div class="row">--}}
+                                    {{--<label class="col-md-2 control-label">列后台名称</label>--}}
+                                    {{--<div class="col-md-8"><input type="text" readonly class="form-control" name="name" value="{{$v->name or ''}}"></div>--}}
+                                {{--</div>--}}
                                 <div class="row">
-                                    <label class="col-md-2 control-label">后台名称</label>
-                                    <div class="col-md-8"><input type="text" readonly class="form-control" name="name" value="{{$v->name or ''}}"></div>
-                                </div>
-                                <div class="row">
-                                    <label class="col-md-2 control-label">标题</label>
+                                    <label class="col-md-2 control-label">列标题</label>
                                     <div class="col-md-8"><input type="text" readonly class="form-control" name="title" value="{{$v->title or ''}}"></div>
                                 </div>
                                 <div class="row">
-                                    <label class="col-md-2 control-label">描述</label>
+                                    <label class="col-md-2 control-label">列描述</label>
                                     <div class="col-md-8"><input type="text" readonly class="form-control" name="description" value="{{$v->description or ''}}"></div>
                                 </div>
                                 <div class="row">
-                                    <label class="col-md-2 control-label">默认值</label>
+                                    <label class="col-md-2 control-label">列默认值</label>
                                     <div class="col-md-8"><input type="text" readonly class="form-control" name="default" value="{{$v->default or ''}}"></div>
                                 </div>
                             </div>
@@ -199,7 +201,7 @@
 
 
 <div class="modal fade" id="edit-modal">
-    <div class="col-md-8 col-md-offset-2" id="edit-ctn" style="margin-top:64px;margin-bottom:64px;background:#fff;"></div>
+    <div class="col-md-8 col-md-offset-2" id="edit-ctn" style="margin-top:64px;margin-bottom:64px;padding-top:32px;background:#fff;"></div>
 </div>
 
 {{--clone--}}
@@ -221,15 +223,16 @@
                     <label class="col-md-8 col-md-offset-2 question-title">添加列</label>
                 </div>
 
-                <div class="form-group">
-                    <label class="control-label col-md-2">后台名称</label>
-                    <div class="col-md-8">
-                        <div><input type="text" class="form-control" name="name" placeholder="请输入后台名称"></div>
-                    </div>
-                </div>
+                {{--<div class="form-group">--}}
+                    {{--<label class="control-label col-md-2">后台名称 <span class="text-red">*</span></label>--}}
+
+                    {{--<div class="col-md-8">--}}
+                        {{--<div><input type="text" class="form-control" name="name" placeholder="请输入后台名称" required></div>--}}
+                    {{--</div>--}}
+                {{--</div>--}}
 
                 <div class="form-group">
-                    <label class="control-label col-md-2">列名</label>
+                    <label class="control-label col-md-2">列标题 <span class="text-red">*</span></label>
                     <div class="col-md-8">
                         <div><input type="text" class="form-control" name="title" placeholder="请输入备注"></div>
                     </div>

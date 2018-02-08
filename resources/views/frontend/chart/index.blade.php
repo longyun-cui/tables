@@ -1,10 +1,10 @@
 @extends('frontend.layout.layout')
 
-@section('title','图')
-@section('header','图')
-@section('description','图')
+@section('title') {{ $chart->title }} @endsection
+@section('header') {{ $chart->title }} @endsection
+@section('description') {{ $chart->description }} @endsection
 @section('breadcrumb')
-    <li><a href="{{url('/')}}"><i class="fa fa-home"></i>首页</a></li>
+    <li><a href="{{url('/home')}}"><i class="fa fa-home"></i>首页</a></li>
     <li><a href="#"><i class="fa "></i>Here</a></li>
 @endsection
 
@@ -16,26 +16,24 @@
 </div>
 
 {{--图--}}
-@foreach($charts as $num => $chart)
 <div class="row">
     <div class="col-md-12">
         <!-- BEGIN PORTLET-->
         <div class="box box-info">
 
             <div class="box-header with-border" style="margin:16px 0;">
-                <h3 class="box-title">{{$chart->title}}</h3>
-                <small> （来自 <a href="{{url('/u/'.$chart->user->id)}}" target="_blank">{{$chart->user->name}}</a> 的表：{{$chart->table->title}} ）</small>
+                <h3 class="box-title">chart 图表</h3>
             </div>
 
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-12">
                         @if($chart->type == 3)
-                            @foreach($chart->chart_datas->rows as $k => $v)
-                                <div id="echart-container-{{$num}}-{{$k}}" style="width:100%;height:320px;margin-bottom:48px;"></div>
+                            @foreach($chart_datas->rows as $k => $v)
+                                <div id="echart-container-{{$k}}" style="width:100%;height:320px;margin-bottom:48px;"></div>
                             @endforeach
                         @else
-                            <div id="echart-container-{{$num}}" style="width:100%;height:500px;"></div>
+                            <div id="echart-container" style="width:100%;height:500px;"></div>
                         @endif
                     </div>
                 </div>
@@ -48,7 +46,6 @@
         <!-- END PORTLET-->
     </div>
 </div>
-@endforeach
 
 @endsection
 
@@ -59,7 +56,6 @@
 <script>
     $(function() {
 
-        @foreach($charts as $num => $chart)
         @if($chart->type == 1 || $chart->type == 2)
             var option = {
 //                tooltip: {
@@ -87,7 +83,7 @@
                 },
                 legend: {
                     data:[
-                        @foreach($chart->chart_datas->columns as $v)
+                        @foreach($chart_datas->columns as $v)
                             @if (!$loop->last)  '{{$v->column->title}}',
                             @else '{{$v->column->title}}'
                             @endif
@@ -98,7 +94,7 @@
                     {
                         type: 'category',
                         data: [
-                            @foreach($chart->chart_datas->rows as $v)
+                            @foreach($chart_datas->rows as $v)
                                     @if (!$loop->last) '{{$v->row_title}}', @else '{{$v->row_title}}' @endif
                             @endforeach
                         ]
@@ -110,14 +106,14 @@
                     }
                 ],
                 series: [
-                    @foreach($chart->chart_datas->columns as $k => $v)
+                    @foreach($chart_datas->columns as $k => $v)
                         @if (!$loop->last)
                         {
                             name : '{{$v->column->title}}',
                             type: @if($chart->type == 1) 'line' @elseif($chart->type == 2) 'bar' @endif ,
                             label: 'labelOption',
                             data : [
-                                @foreach($chart->chart_datas->rows as $val)
+                                @foreach($chart_datas->rows as $val)
                                 @if (!$loop->last) {{$val->datas[$k]->content}},
                                 @else {{$val->datas[$k]->content}}
                                 @endif
@@ -130,7 +126,7 @@
                             type: @if($chart->type == 1) 'line' @elseif($chart->type == 2) 'bar' @endif ,
                             label: 'labelOption',
                             data : [
-                                @foreach($chart->chart_datas->rows as $val)
+                                @foreach($chart_datas->rows as $val)
                                 @if (!$loop->last) {{$val->datas[$k]->content}},
                                 @else {{$val->datas[$k]->content}}
                                 @endif
@@ -142,12 +138,12 @@
 
                 ]
             };
-            var myChart = echarts.init(document.getElementById('echart-container-{{$num}}'));
+            var myChart = echarts.init(document.getElementById('echart-container'));
             myChart.setOption(option);
         @elseif($chart->type == 3)
             var option;
             var myChart;
-            @foreach($chart->chart_datas->rows as $k => $v)
+            @foreach($chart_datas->rows as $k => $v)
             option = {
                 title : {
                     text: '{{$v->row_title}}',
@@ -169,7 +165,7 @@
                     orient: 'vertical',
                     left: 'left',
                     data: [
-                        @foreach($chart->chart_datas->columns as $va)
+                        @foreach($chart_datas->columns as $va)
                             @if (!$loop->last) '{{$va->column->title}}',
                             @else '{{$va->column->title}}'
                             @endif
@@ -185,16 +181,16 @@
                         data:[
                             @foreach($v->datas as $key => $val)
                                 @if (!$loop->last)
-                                { value: '{{$val->content}}', name: '{{$chart->chart_datas->columns[$key]->column->title}}' },
+                                { value: '{{$val->content}}', name: '{{$chart_datas->columns[$key]->column->title}}' },
                                 @else
-                                { value: '{{$val->content}}', name: '{{$chart->chart_datas->columns[$key]->column->title}}' }
+                                { value: '{{$val->content}}', name: '{{$chart_datas->columns[$key]->column->title}}' }
                                 @endif
                             @endforeach
                         ]
                     }
                 ]
             };
-            myChart = echarts.init(document.getElementById('echart-container-{{$num}}-{{$k}}'));
+            myChart = echarts.init(document.getElementById('echart-container-{{$k}}'));
             myChart.setOption(option);
             @endforeach
         @elseif($chart->type == 4)
@@ -205,7 +201,7 @@
                 tooltip: {},
                 legend: {
                     data: [
-                        @foreach($chart->chart_datas->rows as $v)
+                        @foreach($chart_datas->rows as $v)
                                 @if (!$loop->last) '{{$v->row_title}}', @else '{{$v->row_title}}' @endif
                         @endforeach
                     ]
@@ -228,7 +224,7 @@
                         }
                     },
                     indicator: [
-                        @foreach($chart->chart_datas->columns as $v)
+                        @foreach($chart_datas->columns as $v)
                             @if (!$loop->last) { name: '{{$v->column->title}}', max: '{{$v->max}}' },
                             @else { name: '{{$v->column->title}}', max: '{{$v->max}}' }
                             @endif
@@ -244,7 +240,7 @@
                         }
                     },
                     data : [
-                            @foreach($chart->chart_datas->rows as $v)
+                            @foreach($chart_datas->rows as $v)
                             @if (!$loop->last)
                         {
                             value : [
@@ -272,10 +268,12 @@
                     ]
                 }]
             };
-            var myChart = echarts.init(document.getElementById('echart-container-{{$num}}'));
+            var myChart = echarts.init(document.getElementById('echart-container'));
             myChart.setOption(option);
         @endif
-        @endforeach
+
+
+
 
     });
 

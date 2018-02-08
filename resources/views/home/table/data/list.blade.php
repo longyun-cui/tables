@@ -1,8 +1,8 @@
 @extends('home.layout.layout')
 
-@section('title','表格数据')
-@section('header','表格数据')
-@section('description','表格数据')
+@section('title') {{ $data->title or '' }} @endsection
+@section('header') {{ $data->title or '' }} @endsection
+@section('description') {{ $data->description or '' }} @endsection
 @section('breadcrumb')
     <li><a href="{{url('/home')}}"><i class="fa fa-home"></i>首页</a></li>
     <li><a href="{{url('/home/table/list')}}"><i class="fa "></i>表格列表</a></li>
@@ -13,6 +13,50 @@
 @section('content')
 <div style="display:none;">
     <input type="hidden" id="table_id" value="{{$table_encode or ''}}" readonly>
+</div>
+
+{{--表格--}}
+<div class="row">
+    <div class="col-md-12">
+        <!-- BEGIN PORTLET-->
+        <div class="box box-info">
+
+            <div class="box-header with-border" style="margin:16px 0;">
+                <h3 class="box-title">{{ $data->title or '' }} <small>（基本信息）</small> </h3>
+
+                <div class="pull-right">
+                    <a href="{{ url('home/table/edit?id='.$table_encode) }}">
+                        <button type="button" onclick="" class="btn btn-success pull-right"><i class="fa fa-edit"></i> 编辑表结构</button></a>
+                </div>
+            </div>
+
+            <div class="box-body form-horizontasl form-bordered">
+                <div class="form-group row">
+                    <label class="control-label col-md-2 text-right"><span class="text-red">*</span> 后台名称：</label>
+                    <div class="col-md-8 ">{{$data->name or ''}}</div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-md-2 text-right"><span class="text-red">*</span> 标题：</label>
+                    <div class="col-md-8 ">{{$data->title or ''}}</div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-md-2 text-right">备注：</label>
+                    <div class="col-md-8 ">{{$data->description or ''}}</div>
+                </div>
+            </div>
+
+            <div class="box-footer">
+                <div class="row" style="margin:16px 0;">
+                    <div class="col-md-offset-0 col-md-10">
+                        <a href="{{ url('home/table/edit?id='.$table_encode) }}">
+                            <button type="button" onclick="" class="btn btn-success"><i class="fa fa-edit"></i> 编辑</button></a>
+                        <button type="button" onclick="history.go(-1);" class="btn btn-default">返回</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END PORTLET-->
+    </div>
 </div>
 
 {{--表格--}}
@@ -148,9 +192,11 @@
                         <th>备注</th>
                         <th>图标类型</th>
                         <th>是否分享</th>
+                        <th>查看图</th>
                         <th>操作</th>
                     </tr>
                     <tr>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -189,6 +235,10 @@
                                 @if($chart->is_shared == 1) <small class="label bg-green">分享</small>
                                 @else <small class="label bg-red">私</small>
                                 @endif
+                            </td>
+                            <td>
+                                <a target="_blank" href="/chart?id={{encode($chart->id)}}">
+                                    <button type="button" class="btn btn-sm bg-info">查看图</button></a>
                             </td>
                             <td>
                                 <div class="btn-group">

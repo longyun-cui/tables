@@ -60,7 +60,7 @@ class TableRepository
             }
         }
 
-        return view('frontend.table.index')->with(['datas'=>$tables]);
+        return view('frontend.root.tables')->with(['datas'=>$tables]);
     }
 
 

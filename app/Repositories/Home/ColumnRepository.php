@@ -86,16 +86,16 @@ class ColumnRepository {
         $messages = [
             'table_id.required' => '参数有误',
             'id.required' => '参数有误',
-            'name.required' => '请输入名称',
+//            'name.required' => '请输入后台名称',
             'title.required' => '请输入标题',
-            'default.required' => '请输入默认值',
+//            'default.required' => '请输入默认值',
         ];
         $v = Validator::make($post_data, [
             'table_id' => 'required',
             'id' => 'required',
-            'name' => 'required',
-            'title' => 'required',
-            'default' => 'required'
+//            'name' => 'required',
+            'title' => 'required'//,
+//            'default' => 'required'
         ], $messages);
         if ($v->fails())
         {

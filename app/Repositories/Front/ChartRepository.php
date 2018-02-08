@@ -87,7 +87,7 @@ class ChartRepository
         }
 
 //        dd($charts->toArray());
-        return view('frontend.chart.index')->with(['charts'=>$charts]);
+        return view('frontend.root.charts')->with(['charts'=>$charts]);
     }
 
     /*
