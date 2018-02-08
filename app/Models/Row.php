@@ -7,7 +7,7 @@ class Row extends Model
     //
     protected $table = "rows";
     protected $fillable = [
-        'sort', 'type', 'user_id', 'table_id', 'name', 'title', 'description',
+        'sort', 'type', 'user_id', 'table_id', 'name', 'title', 'description', 'is_shared',
         'visit_num', 'share_num'
     ];
     protected $dateFormat = 'U';

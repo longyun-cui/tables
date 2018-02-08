@@ -1,11 +1,10 @@
-@extends('home.layout.layout')
+@extends('frontend.layout.layout')
 
-@section('title','表格数据')
-@section('header','表格数据')
-@section('description','表格数据')
+@section('title','表')
+@section('header','表')
+@section('description','表')
 @section('breadcrumb')
-    <li><a href="{{url('/home')}}"><i class="fa fa-home"></i>首页</a></li>
-    <li><a href="{{url('/home/table/list')}}"><i class="fa "></i>表格列表</a></li>
+    <li><a href="{{url('/')}}"><i class="fa fa-home"></i>首页</a></li>
     <li><a href="#"><i class="fa "></i>Here</a></li>
 @endsection
 
@@ -16,17 +15,15 @@
 </div>
 
 {{--表格--}}
+@foreach($datas as $data)
 <div class="row">
     <div class="col-md-12">
         <!-- BEGIN PORTLET-->
         <div class="box box-info">
 
             <div class="box-header with-border" style="margin:16px 0;">
-                <h3 class="box-title">表格数据</h3>
-
-                <div class="pull-right">
-                    <button type="button" onclick="" class="btn btn-success pull-right show-add-data"><i class="fa fa-plus"></i> 添加数据</button>
-                </div>
+                <h3 class="box-title">{{ $data->title or '' }}</h3>
+                <small>（ 来自 <a href="{{url('/u/'.$data->user->id)}}" target="_blank">{{$data->user->name}}</a> ）</small>
             </div>
 
             <div class="box-body" id="content-main-body">
@@ -37,28 +34,6 @@
                         @foreach($data->columns as $column)
                             <th>{{$column->title}}</th>
                         @endforeach
-                        <th>是否分享</th>
-                        <th>操作</th>
-                    </tr>
-                    <tr>
-                        @foreach($data->columns as $column)
-                            <td></td>
-                        @endforeach
-                        <td></td>
-                        <td>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-success">搜索</button>
-                                <button type="button" class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown">
-                                    <span class="caret"></span>
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a href="#">重置</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="#">Separated link</a></li>
-                                </ul>
-                            </div>
-                        </td>
                     </tr>
                     </thead>
                     <tbody>
@@ -67,34 +42,6 @@
                         @foreach($row->datas as $content)
                             <td>{{$content->content or ''}}</td>
                         @endforeach
-                        <td>
-                            @if($row->is_shared == 1) <small class="label bg-green">分享</small>
-                            @else <small class="label bg-red">私</small>
-                            @endif
-                        </td>
-                        <td>
-
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-primary">操作</button>
-                                <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                    <span class="caret"></span>
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a class="show-edit-data" data-id="{{encode($row->id)}}">编辑数据</a></li>
-                                    @if($row->is_shared == 1)
-                                        <li><a class="row-disshared-submit" data-id="'+value+'">取消分享</a></li>
-                                    @else
-                                        <li><a class="row-enshared-submit" data-id="'+value+'">分享</a></li>
-                                    @endif
-                                    {{--<li><a href="/admin/statistics/page?module=2&id='+value+'">流量统计</a></li>--}}
-                                    {{--<li><a class="download-qrcode" data-id="'+value+'">下载二维码</a></li>--}}
-                                    <li><a class="row-delete-submit" data-id="{{encode($row->id)}}">删除</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="#">Separated link</a></li>
-                                </ul>
-                            </div>
-                        </td>
                     </tr>
                     @endforeach
                     </tbody>
@@ -102,138 +49,11 @@
                 <!-- datatable end -->
             </div>
 
-            <div class="box-footer">
-                <div class="row" style="margin:16px 0;">
-                    <div class="col-md-offset-0 col-md-10">
-                        <button type="button" onclick="" class="btn btn-primary _none"><i class="fa fa-check"></i> 提交</button>
-                        <button type="button" onclick="history.go(-1);" class="btn btn-default">返回</button>
-                    </div>
-                </div>
-            </div>
         </div>
         <!-- END PORTLET-->
     </div>
 </div>
-
-
-
-{{--modal--}}
-<div class="modal fade" id="edit-modal">
-    <div class="col-md-8 col-md-offset-2" id="edit-ctn" style="margin-top:54px;margin-bottom:64px;padding:32px 0;background:#fff;"></div>
-</div>
-
-
-
-{{--图--}}
-<div class="row">
-    <div class="col-md-12">
-        <!-- BEGIN PORTLET-->
-        <div class="box box-warning">
-
-            <div class="box-header with-border" style="margin:16px 0;">
-                <h3 class="box-title">Charts 表图</h3>
-
-                <div class="pull-right">
-                    <button type="button" onclick="" class="btn btn-success pull-right show-add-chart"><i class="fa fa-plus"></i> 创建图</button>
-                </div>
-            </div>
-
-            <div class="box-body" id="chart-list-body">
-                <!-- datatable start -->
-                <table class='table table-striped table-bordered' id='datatable_ajax'>
-                    <thead>
-                    <tr role='row' class='heading'>
-                        <th>名称</th>
-                        <th>标题</th>
-                        <th>备注</th>
-                        <th>图标类型</th>
-                        <th>是否分享</th>
-                        <th>操作</th>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-success">搜索</button>
-                                <button type="button" class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown">
-                                    <span class="caret"></span>
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a href="#">重置</a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="#">Separated link</a></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($data->charts as $chart)
-                        <tr class="chart-option" data-id="{{encode($chart->id)}}">
-                            <td>{{$chart->name or ''}}</td>
-                            <td>{{$chart->title or ''}}</td>
-                            <td>{{$chart->description or ''}}</td>
-                            <td>
-                                @if($chart->type == 1)  折线图
-                                @elseif($chart->type == 2)  柱状图
-                                @elseif($chart->type == 3)  饼图
-                                @elseif($chart->type == 4)  雷达图
-                                @endif
-                            </td>
-                            <td>
-                                @if($chart->is_shared == 1) <small class="label bg-green">分享</small>
-                                @else <small class="label bg-red">私</small>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-primary">操作</button>
-                                    <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                        <span class="caret"></span>
-                                        <span class="sr-only">Toggle Dropdown</span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li><a target="_blank" href="/chart?id={{encode($chart->id)}}">查看图</a></li>
-                                        <li><a class="show-edit-chart" data-id="{{encode($chart->id)}}">编辑结构</a></li>
-                                        @if($chart->is_shared == 1)
-                                            <li><a class="chart-disshared-submit" data-id="'+value+'">取消分享</a></li>
-                                        @else
-                                            <li><a class="chart-enshared-submit" data-id="'+value+'">分享</a></li>
-                                        @endif
-                                        <li><a class="chart-delete-submit" data-id="{{encode($chart->id)}}">删除</a></li>
-                                        {{--<li><a href="/admin/statistics/page?module=2&id='+value+'">流量统计</a></li>--}}
-                                        {{--<li><a class="download-qrcode" data-id="'+value+'">下载二维码</a></li>--}}
-                                        <li class="divider"></li>
-                                        <li><a href="#">Separated link</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-                <!-- datatable end -->
-            </div>
-
-            <div class="box-footer">
-                <div class="row" style="margin:16px 0;">
-                    <div class="col-md-offset-0 col-md-10">
-                        <button type="button" onclick="" class="btn btn-primary _none"><i class="fa fa-check"></i> 提交</button>
-                        <button type="button" onclick="history.go(-1);" class="btn btn-default">返回</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <!-- END PORTLET-->
-    </div>
-</div>
-
+@endforeach
 
 @endsection
 
@@ -334,30 +154,26 @@
                     {
                         'data': 'encode_id',
                         'orderable': false,
-                        render: function(data, type, row, meta) {
-                            var shared_html = '';
-                            if(row.is_shared == 1)
-                                shared_html = '<li><a class="chart-disshared-submit" data-id="'+data+'">取消分享</a></li>';
-                            else
-                                shared_html = '<li><a class="chart-enshared-submit" data-id="'+data+'">分享</a></li>';
+                        render: function(value) {
                             var html =
-                                '<div class="btn-group">'+
-                                '<button type="button" class="btn btn-sm btn-primary">操作</button>'+
-                                '<button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'+
-                                '<span class="caret"></span>'+
-                                '<span class="sr-only">Toggle Dropdown</span>'+
-                                '</button>'+
-                                '<ul class="dropdown-menu" role="menu">'+
-                                '<li><a href="/home/table/edit?id='+data+'">编辑结构</a></li>'+
-                                '<li><a href="/home/table/data?id='+data+'">数据管理</a></li>'+
-                                shared_html+
-//                                '<li><a href="/admin/statistics/page?module=2&id='+data+'">流量统计</a></li>'+
-//                                '<li><a class="download-qrcode" data-id="'+data+'">下载二维码</a></li>'+
-                                '<li><a class="chart-delete-submit" data-id="'+data+'" >删除</a></li>'+
-                                '<li class="divider"></li>'+
-                                '<li><a href="#">Separated link</a></li>'+
-                                '</ul>'+
-                                '</div>';
+                                    '<div class="btn-group">'+
+                                    '<button type="button" class="btn btn-sm btn-primary">操作</button>'+
+                                    '<button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'+
+                                    '<span class="caret"></span>'+
+                                    '<span class="sr-only">Toggle Dropdown</span>'+
+                                    '</button>'+
+                                    '<ul class="dropdown-menu" role="menu">'+
+                                    '<li><a href="/home/table/edit?id='+value+'">编辑</a></li>'+
+                                    '<li><a href="/home/table/data?id='+value+'">数据管理</a></li>'+
+                                    '<li><a class="article-delete-submit" data-id="'+value+'" >删除</a></li>'+
+                                    '<li><a class="article-enable-submit" data-id="'+value+'">启用</a></li>'+
+                                    '<li><a class="article-disable-submit" data-id="'+value+'">禁用</a></li>'+
+                                    '<li><a href="/admin/statistics/page?module=2&id='+value+'">流量统计</a></li>'+
+                                    '<li><a class="download-qrcode" data-id="'+value+'">下载二维码</a></li>'+
+                                    '<li class="divider"></li>'+
+                                    '<li><a href="#">Separated link</a></li>'+
+                                    '</ul>'+
+                                    '</div>';
                             return html;
                         }
                     }
@@ -581,8 +397,8 @@
             $('#edit-modal').modal('hide');
         });
 
-        // Row 数据（行） 【删除】
-        $("#content-main-body").on('click', '.delete-this-row', function() {
+        // 显示编辑数据
+        $(".delete-this-row").on('click', function() {
             var that = $(this);
             layer.msg('确定要删除该"记录"么', {
                 time: 0
@@ -609,69 +425,8 @@
             });
         });
 
-        // Row 数据（行） 【分享】
-        $("#content-main-body").on('click', '.row-enshared-submit', function() {
-            var that = $(this);
-            layer.msg('确定要分享该"记录"么', {
-                time: 0
-                ,btn: ['确定', '取消']
-                ,yes: function(index){
-                    $.post(
-                        "/home/table/data/enshared",
-                        {
-                            _token: $('meta[name="_token"]').attr('content'),
-                            table_id:$('#table_id').val(),
-                            row_id:that.parents('.row-option').attr('data-id')
-                        },
-                        function(data){
-                            if(!data.success) layer.msg(data.msg);
-                            else
-                            {
-                                layer.msg(data.msg);
-                                location.reload();
-                            }
-                        },
-                        'json'
-                    );
-                }
-            });
-        });
-
-        // Row 数据（行） 【取消分享】
-        $("#content-main-body").on('click', '.row-disshared-submit', function() {
-            var that = $(this);
-            layer.msg('确定要取消分享该"记录"么', {
-                time: 0
-                ,btn: ['确定', '取消']
-                ,yes: function(index){
-                    $.post(
-                        "/home/table/data/disshared",
-                        {
-                            _token: $('meta[name="_token"]').attr('content'),
-                            table_id:$('#table_id').val(),
-                            row_id:that.parents('.row-option').attr('data-id')
-                        },
-                        function(data){
-                            if(!data.success) layer.msg(data.msg);
-                            else
-                            {
-                                layer.msg(data.msg);
-                                location.reload();
-                            }
-                        },
-                        'json'
-                    );
-                }
-            });
-        });
-
-
-
-
-
-
-        // CHart 图 【删除】
-        $("#chart-list-body").on('click', ".chart-delete-submit", function() {
+        // 显示编辑数据
+        $(".delete-this-chart").on('click', function() {
             var that = $(this);
             layer.msg('确定要删除该"图"么', {
                 time: 0
@@ -698,57 +453,74 @@
             });
         });
 
-        // CHart 图 【分享】
-        $("#chart-list-body").on('click', ".chart-enshared-submit", function() {
+
+
+
+
+        // 【删除】 文章
+        $("#article-main-body").on('click', ".article-delete-submit", function() {
             var that = $(this);
-            layer.msg('确定分享该"图"？', {
+            layer.msg('确定要删除该"文章"么', {
                 time: 0
                 ,btn: ['确定', '取消']
                 ,yes: function(index){
                     $.post(
-                        "/home/table/chart/enshared",
-                        {
-                            _token: $('meta[name="_token"]').attr('content'),
-                            table_id:$('#table_id').val(),
-                            chart_id:that.parents('.chart-option').attr('data-id')
-                        },
-                        function(data){
-                            if(!data.success) layer.msg(data.msg);
-                            else
+                            "/home/table/delete",
                             {
-                                layer.msg(data.msg);
-                                location.reload();
-                            }
-                        },
-                        'json'
+                                _token: $('meta[name="_token"]').attr('content'),
+                                id:that.attr('data-id')
+                            },
+                            function(data){
+                                if(!data.success) layer.msg(data.msg);
+                                else location.reload();
+                            },
+                            'json'
                     );
                 }
             });
         });
 
-        // Chart 图 【取消分享】
-        $("#chart-list-body").on('click', ".chart-disshared-submit", function() {
+        // 【启用】 文章
+        $("#article-main-body").on('click', ".article-enable-submit", function() {
             var that = $(this);
-            layer.msg('确定取消分享该"图"？', {
+            layer.msg('确定启用该"文章"？', {
                 time: 0
                 ,btn: ['确定', '取消']
                 ,yes: function(index){
                     $.post(
-                        "/home/table/chart/disshared",
-                        {
-                            _token: $('meta[name="_token"]').attr('content'),
-                            table_id:$('#table_id').val(),
-                            chart_id:that.parents('.chart-option').attr('data-id')
-                        },
-                        function(data){
-                            if(!data.success) layer.msg(data.msg);
-                            else
+                            "/admin/article/enable",
                             {
-                                layer.msg(data.msg);
-                                location.reload();
-                            }
-                        },
-                        'json'
+                                _token: $('meta[name="_token"]').attr('content'),
+                                id:that.attr('data-id')
+                            },
+                            function(data){
+                                if(!data.success) layer.msg(data.msg);
+                                else location.reload();
+                            },
+                            'json'
+                    );
+                }
+            });
+        });
+
+        // 【禁用】 文章
+        $("#article-main-body").on('click', ".article-disable-submit", function() {
+            var that = $(this);
+            layer.msg('确定禁用该"文章"？', {
+                time: 0
+                ,btn: ['确定', '取消']
+                ,yes: function(index){
+                    $.post(
+                            "/admin/article/disable",
+                            {
+                                _token: $('meta[name="_token"]').attr('content'),
+                                id:that.attr('data-id')
+                            },
+                            function(data){
+                                if(!data.success) layer.msg(data.msg);
+                                else location.reload();
+                            },
+                            'json'
                     );
                 }
             });

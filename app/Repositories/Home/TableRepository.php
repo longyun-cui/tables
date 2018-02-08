@@ -22,6 +22,49 @@ class TableRepository
         $this->model = new Table;
     }
 
+    // 返回平台主页【表格】页
+    public function index()
+    {
+
+        $table_encode = request("id", 0);
+        $table_id = decode($table_encode);
+        if (!$table_id && intval($table_id) !== 0) return response("参数有误", 404);
+
+        $tables = Table::with([
+            'user',
+            'columns' => function ($query) { $query->orderBy('order', 'asc'); },
+            'rows' => function ($query) { $query->with(['contents'])->where('is_shared',1); },
+            'charts' => function ($query) { $query->with(['formats']); }
+        ])->where(['is_shared'=>1])->orderBy('id', 'desc')->get();
+
+        foreach($tables as $num => $table)
+        {
+            if ($table)
+            {
+                foreach ($table->rows as $key => $row) {
+                    $datas = [];
+                    $contents = $row->contents;
+                    foreach ($table->columns as $ke => $column) {
+                        $datas[$ke] = [];
+                        for ($i = 0; $i < count($contents); $i++) {
+                            if ($contents[$i]->column_id == $column->id) {
+                                $datas[$ke] = $contents[$i];
+//                                unset($contents[$i]);
+                                continue;
+                            }
+                        }
+                    }
+                    $table->rows[$key]->datas = $datas;
+                }
+
+            }
+        }
+
+        return view('frontend.table.index')->with(['datas'=>$tables]);
+    }
+
+
+
     // 返回列表数据
     public function get_list_datatable($post_data)
     {
@@ -52,6 +95,8 @@ class TableRepository
         }
         return datatable_response($list, $draw, $total);
     }
+
+
 
     // 返回添加视图
     public function view_create()
@@ -154,27 +199,22 @@ class TableRepository
         }
     }
 
-    // 删除
+
+
+    // 【删除表格】
     public function delete($post_data)
     {
-        $user = Auth::user();
         $id = decode($post_data["id"]);
-        if (intval($id) !== 0 && !$id) return response_error([], "该文章不存在，刷新页面试试");
+        if (intval($id) !== 0 && !$id) return response_error([], "该表格不存在，刷新页面试试");
 
+        $user = Auth::user();
         $table = Table::find($id);
         if ($table->user_id != $user->id) return response_error([], "你没有操作权限");
 
         DB::beginTransaction();
         try {
             $bool = $table->delete();
-            if ($bool) {
-//                $item = Item::find($table->item_id);
-//                if($item)
-//                {
-//                    $bool1 = $item->delete();
-//                    if(!$bool1) throw new Exception("delete-item--fail");
-//                }
-            } else throw new Exception("delete-article--fail");
+            if (!$bool) throw new Exception("delete--table--fail");
 
             DB::commit();
             return response_success([]);
@@ -185,55 +225,43 @@ class TableRepository
 
     }
 
-    // 启用
-    public function enable($post_data)
+    // 【分享】
+    public function enshared($post_data)
     {
-        $admin = Auth::guard('admin')->user();
         $id = decode($post_data["id"]);
-        if (intval($id) !== 0 && !$id) return response_error([], "该文章不存在，刷新页面试试");
+        if (intval($id) !== 0 && !$id) return response_error([], "该表格不存在，刷新页面试试");
 
-        $article = Article::find($id);
-        if ($article->admin_id != $admin->id) return response_error([], "你没有操作权限");
-        $update["active"] = 1;
+        $user = Auth::user();
+        $table = Table::find($id);
+        if ($table->user_id != $user->id) return response_error([], "你没有操作权限");
+        $update["is_shared"] = 1;
         DB::beginTransaction();
         try {
-            $bool = $article->fill($update)->save();
-            if ($bool) {
-                $item = Item::find($article->item_id);
-                if ($item) {
-                    $bool1 = $item->fill($update)->save();
-                    if (!$bool1) throw new Exception("update-item--fail");
-                }
-            } else throw new Exception("update-article--fail");
+            $bool = $table->fill($update)->save();
+            if(!$bool) throw new Exception("update--table--fail");
 
             DB::commit();
             return response_success([]);
         } catch (Exception $e) {
             DB::rollback();
-            return response_fail([], '启用失败，请重试');
+            return response_fail([], '分享失败，请重试');
         }
     }
 
-    // 禁用
-    public function disable($post_data)
+    // 【取消分享】
+    public function disshared($post_data)
     {
-        $admin = Auth::guard('admin')->user();
         $id = decode($post_data["id"]);
-        if (intval($id) !== 0 && !$id) return response_error([], "该文章不存在，刷新页面试试");
+        if (intval($id) !== 0 && !$id) return response_error([], "该表格不存在，刷新页面试试");
 
-        $article = Article::find($id);
-        if ($article->admin_id != $admin->id) return response_error([], "你没有操作权限");
-        $update["active"] = 9;
+        $user = Auth::user();
+        $table = Table::find($id);
+        if ($table->user_id != $user->id) return response_error([], "你没有操作权限");
+        $update["is_shared"] = 9;
         DB::beginTransaction();
         try {
-            $bool = $article->fill($update)->save();
-            if ($bool) {
-                $item = Item::find($article->item_id);
-                if ($item) {
-                    $bool1 = $item->fill($update)->save();
-                    if (!$bool1) throw new Exception("update-item--fail");
-                }
-            } else throw new Exception("update-article--fail");
+            $bool = $table->fill($update)->save();
+            if(!$bool) throw new Exception("update--table--fail");
 
             DB::commit();
             return response_success([]);
@@ -242,6 +270,7 @@ class TableRepository
             return response_fail([], '禁用失败，请重试');
         }
     }
+
 
 
     /*
@@ -423,15 +452,15 @@ class TableRepository
         } else return response_error([], '表格不存在！');
     }
 
-    // delete
+    // Row 数据行 【删除】
     public function data_delete($post_data)
     {
         $table_encode = $post_data["table_id"];
-        $table_id = decode($post_data["table_id"]);
+        $table_id = decode($table_encode);
         if (intval($table_id) !== 0 && !$table_id) return response_error([], '参数有误！');
 
         $row_encode = $post_data["row_id"];
-        $row_id = decode($post_data["row_id"]);
+        $row_id = decode($row_encode);
         if (intval($row_id) !== 0 && !$row_id) return response_error([], '参数有误！');
 
 
@@ -467,6 +496,102 @@ class TableRepository
                             $msg = $e->getMessage();
 //                            exit($e->getMessage());
 //                            $msg = '删除失败';
+                            return response_fail([], $msg);
+                        }
+                    }
+                    else return response_error([], '该记录不是你的！');
+                }
+                else  return response_error([], '记录不存在！');
+            }
+            else return response_error([], '不是你的表格！');
+        }
+        else return response_error([], '表格不存在！');
+    }
+
+    // Row 数据行 【分享】
+    public function data_enshared($post_data)
+    {
+        $table_encode = $post_data["table_id"];
+        $table_id = decode($table_encode);
+        if (intval($table_id) !== 0 && !$table_id) return response_error([], '参数有误！');
+
+        $row_encode = $post_data["row_id"];
+        $row_id = decode($row_encode);
+        if (intval($row_id) !== 0 && !$row_id) return response_error([], '参数有误！');
+
+
+        $table = Table::find($table_id);
+        if($table)
+        {
+            $user = Auth::user();
+            if ($table->user_id == $user->id)
+            {
+                $row = Row::find($row_id);
+                if($row)
+                {
+                    if ($row->user_id == $user->id)
+                    {
+                        DB::beginTransaction();
+                        try {
+                            $update["is_shared"] = 1;
+                            $bool = $row->fill($update)->save();
+                            if(!$bool) throw new Exception('update-row-fail');
+
+                            DB::commit();
+                            return response_success();
+                        } catch (Exception $e) {
+                            DB::rollback();
+//                            exit($e->getMessage());
+//                            $msg = $e->getMessage();
+                            $msg = '分享失败';
+                            return response_fail([], $msg);
+                        }
+                    }
+                    else return response_error([], '该记录不是你的！');
+                }
+                else  return response_error([], '记录不存在！');
+            }
+            else return response_error([], '不是你的表格！');
+        }
+        else return response_error([], '表格不存在！');
+    }
+
+    // Row 数据行 【取消分享】
+    public function data_disshared($post_data)
+    {
+        $table_encode = $post_data["table_id"];
+        $table_id = decode($table_encode);
+        if (intval($table_id) !== 0 && !$table_id) return response_error([], '参数有误！');
+
+        $row_encode = $post_data["row_id"];
+        $row_id = decode($row_encode);
+        if (intval($row_id) !== 0 && !$row_id) return response_error([], '参数有误！');
+
+
+        $table = Table::find($table_id);
+        if($table)
+        {
+            $user = Auth::user();
+            if ($table->user_id == $user->id)
+            {
+                $row = Row::find($row_id);
+                if($row)
+                {
+                    if ($row->user_id == $user->id)
+                    {
+                        DB::beginTransaction();
+                        try {
+                            $update["is_shared"] = 9;
+                            $bool = $row->fill($update)->save();
+                            if(!$bool) throw new Exception('update-row-fail');
+
+                            DB::commit();
+                            return response_success();
+                        } catch (Exception $e) {
+                            DB::rollback();
+//                            exit($e->getMessage());
+//                            $msg = $e->getMessage();
+                            $msg = '取消分享失败';
                             return response_fail([], $msg);
                         }
                     }
@@ -638,15 +763,15 @@ class TableRepository
         } else return response_error([], '表格不存在！');
     }
 
-    // delete
+    // Chart 图 【删除】
     public function chart_delete($post_data)
     {
         $table_encode = $post_data["table_id"];
-        $table_id = decode($post_data["table_id"]);
+        $table_id = decode($table_encode);
         if (intval($table_id) !== 0 && !$table_id) return response_error([], '参数有误！');
 
         $chart_encode = $post_data["chart_id"];
-        $chart_id = decode($post_data["chart_id"]);
+        $chart_id = decode($chart_encode);
         if (intval($chart_id) !== 0 && !$chart_id) return response_error([], '参数有误！');
 
 
@@ -679,10 +804,106 @@ class TableRepository
                             return response_success();
                         } catch (Exception $e) {
                             DB::rollback();
-                            $msg = $e->getMessage();
 //                            exit($e->getMessage());
-//                            $msg = '删除失败';
-                            return response_fail([], $msg);
+//                            $msg = $e->getMessage();
+                            $msg = '删除失败';
+                            return response_f、ail([], $msg);
+                        }
+                    }
+                    else return response_error([], '该"图"不是你的！');
+                }
+                else  return response_error([], '"图"不存在！');
+            }
+            else return response_error([], '不是你的"图"！');
+        }
+        else return response_error([], '表格不存在！');
+    }
+
+    // Chart 图 【分享】
+    public function chart_enshared($post_data)
+    {
+        $table_encode = $post_data["table_id"];
+        $table_id = decode($table_encode);
+        if (intval($table_id) !== 0 && !$table_id) return response_error([], '参数有误！');
+
+        $chart_encode = $post_data["chart_id"];
+        $chart_id = decode($chart_encode);
+        if (intval($chart_id) !== 0 && !$chart_id) return response_error([], '参数有误！');
+
+
+        $table = Table::find($table_id);
+        if($table)
+        {
+            $user = Auth::user();
+            if ($table->user_id == $user->id)
+            {
+                $chart = Chart::find($chart_id);
+                if($chart)
+                {
+                    if ($chart->user_id == $user->id)
+                    {
+                        DB::beginTransaction();
+                        try {
+                            $update["is_shared"] = 1;
+                            $bool = $chart->fill($update)->save();
+                            if(!$bool) throw new Exception('update-chart-fail');
+
+                            DB::commit();
+                            return response_success();
+                        } catch (Exception $e) {
+                            DB::rollback();
+//                            exit($e->getMessage());
+//                            $msg = $e->getMessage();
+                            $msg = '分享失败';
+                            return response_f、ail([], $msg);
+                        }
+                    }
+                    else return response_error([], '该"图"不是你的！');
+                }
+                else  return response_error([], '"图"不存在！');
+            }
+            else return response_error([], '不是你的"图"！');
+        }
+        else return response_error([], '表格不存在！');
+    }
+
+    // Chart 图 【取消分享】
+    public function chart_disshared($post_data)
+    {
+        $table_encode = $post_data["table_id"];
+        $table_id = decode($table_encode);
+        if (intval($table_id) !== 0 && !$table_id) return response_error([], '参数有误！');
+
+        $chart_encode = $post_data["chart_id"];
+        $chart_id = decode($chart_encode);
+        if (intval($chart_id) !== 0 && !$chart_id) return response_error([], '参数有误！');
+
+
+        $table = Table::find($table_id);
+        if($table)
+        {
+            $user = Auth::user();
+            if ($table->user_id == $user->id)
+            {
+                $chart = Chart::find($chart_id);
+                if($chart)
+                {
+                    if ($chart->user_id == $user->id)
+                    {
+                        DB::beginTransaction();
+                        try {
+                            $update["is_shared"] = 9;
+                            $bool = $chart->fill($update)->save();
+                            if(!$bool) throw new Exception('update-chart-fail');
+
+                            DB::commit();
+                            return response_success();
+                        } catch (Exception $e) {
+                            DB::rollback();
+//                            exit($e->getMessage());
+//                            $msg = $e->getMessage();
+                            $msg = '分享失败';
+                            return response_f、ail([], $msg);
                         }
                     }
                     else return response_error([], '该"图"不是你的！');

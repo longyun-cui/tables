@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <div class="box-body" id="article-main-body">
+            <div class="box-body" id="table-list-body">
                 <!-- datatable start -->
                 <table class='table table-striped table-bordered' id='datatable_ajax'>
                     <thead>
@@ -43,13 +43,15 @@
                         <th>所属目录</th>
                         <th>管理员</th>
                         <th>浏览次数</th>
-                        <th>状态</th>
+                        <th>分享次数</th>
+                        <th>是否分享</th>
                         <th>创建时间</th>
                         <th>修改时间</th>
                         <th>数据管理</th>
                         <th>操作</th>
                     </tr>
                     <tr>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -174,12 +176,18 @@
                         }
                     },
                     {
-                        'data': 'active',
+                        'data': 'share_num',
                         'orderable': false,
                         render: function(val) {
-                            if(val == 0) return '<small class="label bg-teal">未启用</small>';
-                            else if(val == 1) return '<small class="label bg-green">启</small>';
-                            else return '<small class="label bg-red">禁</small>';
+                            return val == null ? 0 : val;
+                        }
+                    },
+                    {
+                        'data': 'is_shared',
+                        'orderable': false,
+                        render: function(val) {
+                            if(val == 1) return '<small class="label bg-green">分享</small>';
+                            else return '<small class="label bg-red">私</small>';
                         }
                     },
                     {
@@ -204,32 +212,37 @@
                         'data': 'encode_id',
                         'orderable': false,
                         render: function(data) {
-                            return '<a href="/home/table/data?id='+data+'"><button type="button" class="btn btn-sm btn-primary">数据管理</button></a>';
+                            return '<a href="/home/table/data?id='+data+'"><button type="button" class="btn btn-sm btn-danger">数据管理</button></a>';
                         }
                     },
                     {
                         'data': 'encode_id',
                         'orderable': false,
-                        render: function(value) {
+                        render: function(data, type, row, meta) {
+                            var shared_html = '';
+                            if(row.is_shared == 1)
+                                shared_html = '<li><a class="table-disshared-submit" data-id="'+data+'">取消分享</a></li>';
+                            else
+                                shared_html = '<li><a class="table-enshared-submit" data-id="'+data+'">分享</a></li>';
+
                             var html =
-                                    '<div class="btn-group">'+
-                                    '<button type="button" class="btn btn-sm btn-primary">操作</button>'+
-                                    '<button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'+
-                                    '<span class="caret"></span>'+
-                                    '<span class="sr-only">Toggle Dropdown</span>'+
-                                    '</button>'+
-                                    '<ul class="dropdown-menu" role="menu">'+
-                                    '<li><a href="/home/table/edit?id='+value+'">编辑</a></li>'+
-                                    '<li><a href="/home/table/data?id='+value+'">数据管理</a></li>'+
-                                    '<li><a class="article-delete-submit" data-id="'+value+'" >删除</a></li>'+
-                                    '<li><a class="article-enable-submit" data-id="'+value+'">启用</a></li>'+
-                                    '<li><a class="article-disable-submit" data-id="'+value+'">禁用</a></li>'+
-                                    '<li><a href="/admin/statistics/page?module=2&id='+value+'">流量统计</a></li>'+
-                                    '<li><a class="download-qrcode" data-id="'+value+'">下载二维码</a></li>'+
-                                    '<li class="divider"></li>'+
-                                    '<li><a href="#">Separated link</a></li>'+
-                                    '</ul>'+
-                                    '</div>';
+                                '<div class="btn-group">'+
+                                '<button type="button" class="btn btn-sm btn-primary">操作</button>'+
+                                '<button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'+
+                                '<span class="caret"></span>'+
+                                '<span class="sr-only">Toggle Dropdown</span>'+
+                                '</button>'+
+                                '<ul class="dropdown-menu" role="menu">'+
+                                '<li><a href="/home/table/edit?id='+data+'">编辑结构</a></li>'+
+                                '<li><a href="/home/table/data?id='+data+'">数据管理</a></li>'+
+                                shared_html+
+//                                '<li><a href="/admin/statistics/page?module=2&id='+data+'">流量统计</a></li>'+
+//                                '<li><a class="download-qrcode" data-id="'+data+'">下载二维码</a></li>'+
+                                '<li><a class="table-delete-submit" data-id="'+data+'" >删除</a></li>'+
+                                '<li class="divider"></li>'+
+                                '<li><a href="#">Separated link</a></li>'+
+                                '</ul>'+
+                                '</div>';
                             return html;
                         }
                     }
@@ -305,10 +318,10 @@
 <script>
     $(function() {
 
-        // 【删除】 文章
-        $("#article-main-body").on('click', ".article-delete-submit", function() {
+        // 表格【删除】
+        $("#table-list-body").on('click', ".table-delete-submit", function() {
             var that = $(this);
-            layer.msg('确定要删除该"文章"么', {
+            layer.msg('确定要删除该"表格"么', {
                 time: 0
                 ,btn: ['确定', '取消']
                 ,yes: function(index){
@@ -328,15 +341,15 @@
             });
         });
 
-        // 【启用】 文章
-        $("#article-main-body").on('click', ".article-enable-submit", function() {
+        // 表格【分享】
+        $("#table-list-body").on('click', ".table-enshared-submit", function() {
             var that = $(this);
-            layer.msg('确定启用该"文章"？', {
+            layer.msg('确定分享该"表格"？', {
                 time: 0
                 ,btn: ['确定', '取消']
                 ,yes: function(index){
                     $.post(
-                            "/admin/article/enable",
+                            "/home/table/enshared",
                             {
                                 _token: $('meta[name="_token"]').attr('content'),
                                 id:that.attr('data-id')
@@ -351,15 +364,15 @@
             });
         });
 
-        // 【禁用】 文章
-        $("#article-main-body").on('click', ".article-disable-submit", function() {
+        // 表格【取消分享】
+        $("#table-list-body").on('click', ".table-disshared-submit", function() {
             var that = $(this);
-            layer.msg('确定禁用该"文章"？', {
+            layer.msg('确定不再分享该"表格"？', {
                 time: 0
                 ,btn: ['确定', '取消']
                 ,yes: function(index){
                     $.post(
-                            "/admin/article/disable",
+                            "/home/table/disshared",
                             {
                                 _token: $('meta[name="_token"]').attr('content'),
                                 id:that.attr('data-id')
@@ -377,7 +390,7 @@
         // 【下载】 二维码
         $("#article-main-body").on('click', ".download-qrcode", function() {
             var that = $(this);
-            window.open('/admin/download_qrcode?sort=article&id='+that.attr('data-id'));
+            window.open('/admin/download_qrcode?sort=table&id='+that.attr('data-id'));
         });
 
     });

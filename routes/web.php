@@ -12,8 +12,11 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/tables');
 });
+Route::get('tables', 'TableController@index');
+Route::get('charts', 'ChartController@index');
+Route::get('chart', 'TableController@view_chart');
 
 /*
  * TEST
@@ -43,9 +46,6 @@ Route::group(['prefix' => 'common'], function () {
 });
 
 
-Route::get('/', 'ChartController@index');
-Route::get('charts', 'ChartController@index');
-Route::get('chart', 'TableController@view_chart');
 
 
 Route::get('admin/i18n', function () {
@@ -66,18 +66,23 @@ Route::group(['prefix' => 'home', 'middleware' => 'home'], function () {
         $controller = "TableController";
 
         Route::get('/create', $controller.'@createAction');
-        Route::match(['get','post'], '/edit', $controller.'@editAction');
+        Route::match(['get','post'], 'edit', $controller.'@editAction');
         Route::match(['get','post'], 'list', $controller.'@viewList');
+        Route::post('delete', $controller.'@deleteAction');
+        Route::post('enshared', $controller.'@ensharedAction');
+        Route::post('disshared', $controller.'@dissharedAction');
 
-        // 数据
+        // 数据（行）
         Route::group(['prefix' => 'data'], function () {
             $controller = "TableController";
 
             Route::get('/', $controller.'@data_index');
-            Route::match(['get','post'], '/edit', $controller.'@data_edit');
+            Route::match(['get','post'], 'edit', $controller.'@data_edit');
             Route::post('/get/add', $controller.'@data_get_add');
             Route::post('/get/edit', $controller.'@data_get_edit');
-            Route::post('/delete', $controller.'@data_delete');
+            Route::post('delete', $controller.'@data_delete');
+            Route::post('enshared', $controller.'@data_enshared');
+            Route::post('disshared', $controller.'@data_disshared');
         });
 
         // 图
@@ -85,10 +90,12 @@ Route::group(['prefix' => 'home', 'middleware' => 'home'], function () {
             $controller = "TableController";
 
             Route::get('/', $controller.'@chart_index');
-            Route::match(['get','post'], '/edit', $controller.'@chart_edit');
+            Route::match(['get','post'], 'edit', $controller.'@chart_edit');
             Route::post('/get/add', $controller.'@chart_get_add');
             Route::post('/get/edit', $controller.'@chart_get_edit');
-            Route::post('/delete', $controller.'@chart_delete');
+            Route::post('delete', $controller.'@chart_delete');
+            Route::post('enshared', $controller.'@chart_enshared');
+            Route::post('disshared', $controller.'@chart_disshared');
         });
     });
 
@@ -97,7 +104,7 @@ Route::group(['prefix' => 'home', 'middleware' => 'home'], function () {
         $controller = "ColumnController";
 
         Route::get('/create', $controller.'@createAction');
-        Route::match(['get','post'], '/edit', $controller.'@editAction');
+        Route::match(['get','post'], 'edit', $controller.'@editAction');
         Route::post('delete', $controller.'@deleteAction');
         Route::post('sort', $controller.'@sortAction');
     });
@@ -107,7 +114,7 @@ Route::group(['prefix' => 'home', 'middleware' => 'home'], function () {
         $controller = "RowController";
 
         Route::get('/create', $controller.'@createAction');
-        Route::match(['get','post'], '/edit', $controller.'@editAction');
+        Route::match(['get','post'], 'edit', $controller.'@editAction');
     });
 
 

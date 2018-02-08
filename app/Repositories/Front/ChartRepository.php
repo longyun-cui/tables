@@ -23,66 +23,17 @@ class ChartRepository
     }
 
 
-    /*
-     * 数据
-     */
-    //
-    public function view_data_index()
-    {
-        $table_encode = request("id", 0);
-        $table_id = decode($table_encode);
-        if (!$table_id && intval($table_id) !== 0) return response("参数有误", 404);
-
-        $table = Table::with([
-            'columns' => function ($query) { $query->orderBy('order', 'asc'); },
-            'rows' => function ($query) { $query->with(['contents']); },
-            'charts' => function ($query) { $query->with(['formats']); }
-        ])->find($table_id);
-
-        if ($table) {
-            $user = Auth::user();
-            if ($table->user_id == $user->id) {
-                foreach ($table->rows as $key => $row) {
-                    $datas = [];
-                    $contents = $row->contents;
-                    foreach ($table->columns as $ke => $column) {
-                        $datas[$ke] = [];
-                        for ($i = 0; $i < count($contents); $i++) {
-                            if ($contents[$i]->column_id == $column->id) {
-                                $datas[$ke] = $contents[$i];
-//                                unset($contents[$i]);
-                                continue;
-                            }
-                        }
-                    }
-                    $table->rows[$key]->datas = $datas;
-                }
-
-                return view('home.table.data.list')->with(['table_encode' => $table_encode, 'data' => $table]);
-            }
-            else return response("不是你的表格！", 404);
-        }
-        else return response("表格不存在！", 404);
-    }
-
-
-    /*
-     * 图
-     */
-    // view chart add html
-
-
-
+    // 返回平台主页【图】页
     public function index()
     {
         $charts = Chart::with([
             'user',
             'table' => function ($query) { $query->with([
                 'columns' => function ($query) { $query->orderBy('order', 'asc'); },
-                'rows' => function ($query) { $query->with(['contents']); }
+                'rows' => function ($query) { $query->with(['contents'])->where('is_shared',1); }
             ]); },
             'formats' => function ($query) { $query->with(['column']); }
-        ])->orderBy('id', 'desc')->get();
+        ])->where(['is_shared'=>1])->orderBy('id', 'desc')->get();
 
         foreach($charts as $num => $chart)
         {
@@ -136,8 +87,58 @@ class ChartRepository
         }
 
 //        dd($charts->toArray());
-        return view('frontend.index')->with(['charts'=>$charts]);
+        return view('frontend.chart.index')->with(['charts'=>$charts]);
     }
+
+    /*
+     * 数据
+     */
+    //
+    public function view_data_index()
+    {
+        $table_encode = request("id", 0);
+        $table_id = decode($table_encode);
+        if (!$table_id && intval($table_id) !== 0) return response("参数有误", 404);
+
+        $table = Table::with([
+            'columns' => function ($query) { $query->orderBy('order', 'asc'); },
+            'rows' => function ($query) { $query->with(['contents']); },
+            'charts' => function ($query) { $query->with(['formats']); }
+        ])->find($table_id);
+
+        if ($table) {
+            $user = Auth::user();
+            if ($table->user_id == $user->id) {
+                foreach ($table->rows as $key => $row) {
+                    $datas = [];
+                    $contents = $row->contents;
+                    foreach ($table->columns as $ke => $column) {
+                        $datas[$ke] = [];
+                        for ($i = 0; $i < count($contents); $i++) {
+                            if ($contents[$i]->column_id == $column->id) {
+                                $datas[$ke] = $contents[$i];
+//                                unset($contents[$i]);
+                                continue;
+                            }
+                        }
+                    }
+                    $table->rows[$key]->datas = $datas;
+                }
+
+                return view('home.table.data.list')->with(['table_encode' => $table_encode, 'data' => $table]);
+            }
+            else return response("不是你的表格！", 404);
+        }
+        else return response("表格不存在！", 404);
+    }
+
+
+    /*
+     * 图
+     */
+    // view chart add html
+
+
 
 
 

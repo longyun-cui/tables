@@ -22,6 +22,12 @@ class TableController extends Controller
         $this->repo = new TableRepository;
     }
 
+
+    public function index()
+    {
+        return $this->repo->index();
+    }
+
     // 列表
     public function viewList()
     {
@@ -40,6 +46,24 @@ class TableController extends Controller
     {
         if(request()->isMethod('get')) return $this->repo->view_edit();
         else if (request()->isMethod('post')) return $this->repo->save(request()->all());
+    }
+
+    // 【删除】
+    public function deleteAction()
+    {
+        return $this->repo->delete(request()->all());
+    }
+
+    // 【分享】
+    public function ensharedAction()
+    {
+        return $this->repo->enshared(request()->all());
+    }
+
+    // 【取消分享】
+    public function dissharedAction()
+    {
+        return $this->repo->disshared(request()->all());
     }
 
 
@@ -67,9 +91,20 @@ class TableController extends Controller
         return $this->repo->data_save(request()->all());
     }
 
+    // Row 【删除】
     public function data_delete()
     {
         return $this->repo->data_delete(request()->all());
+    }
+    // Row 【分享】
+    public function data_enshared()
+    {
+        return $this->repo->data_enshared(request()->all());
+    }
+    // Row 【取消分享】
+    public function data_disshared()
+    {
+        return $this->repo->data_disshared(request()->all());
     }
 
 
@@ -95,10 +130,20 @@ class TableController extends Controller
     {
         return $this->repo->chart_save(request()->all());
     }
-
+    // Chart 【删除】
     public function chart_delete()
     {
         return $this->repo->chart_delete(request()->all());
+    }
+    // Chart 【分享】
+    public function chart_enshared()
+    {
+        return $this->repo->chart_enshared(request()->all());
+    }
+    // Chart 【取消分享】
+    public function chart_disshared()
+    {
+        return $this->repo->chart_disshared(request()->all());
     }
 
 

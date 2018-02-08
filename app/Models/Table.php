@@ -7,7 +7,7 @@ class Table extends Model
     //
     protected $table = "tables";
     protected $fillable = [
-        'sort', 'type', 'user_id', 'name', 'title', 'description',
+        'sort', 'type', 'user_id', 'name', 'title', 'description', 'is_shared',
         'visit_num', 'share_num'
     ];
     protected $dateFormat = 'U';
