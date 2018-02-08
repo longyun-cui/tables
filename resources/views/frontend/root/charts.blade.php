@@ -1,8 +1,8 @@
 @extends('frontend.layout.layout')
 
-@section('title','图')
-@section('header','图')
-@section('description','图')
+@section('title','图形 - 图表站')
+@section('header','图表站')
+@section('description','图形')
 @section('breadcrumb')
     <li><a href="{{url('/')}}"><i class="fa fa-home"></i>首页</a></li>
     <li><a href="#"><i class="fa "></i>Here</a></li>
@@ -17,15 +17,36 @@
 
 {{--图--}}
 @foreach($charts as $num => $chart)
-<div class="row">
+<div class="row" style="margin-top:24px;">
     <div class="col-md-12">
         <!-- BEGIN PORTLET-->
-        <div class="box box-info">
+        <div class="box
+            @if($loop->index % 7 == 0) box-info
+            @elseif($loop->index % 7 == 1) box-danger
+            @elseif($loop->index % 7 == 2) box-success
+            @elseif($loop->index % 7 == 3) box-default
+            @elseif($loop->index % 7 == 4) box-orange
+            @elseif($loop->index % 7 == 5) box-primary
+            @elseif($loop->index % 7 == 6) box-navy
+            @endif
+        ">
 
-            <div class="box-header with-border" style="margin:16px 0;">
+            <div class="box-header with-border" style="margin:16px 0 8px;">
                 <h3 class="box-title">{{$chart->title}}</h3>
                 <small> （来自 <a href="{{url('/u/'.$chart->user->id)}}" target="_blank">{{$chart->user->name}}</a> 的表：{{$chart->table->title}} ）</small>
             </div>
+
+            @if(!empty($data->description))
+                <div class="box-body">
+                    <div class="colo-md-12 text-muted"> {{ $chart->description or '' }} </div>
+                </div>
+            @endif
+
+            @if(!empty($data->content))
+                <div class="box-body">
+                    <div class="colo-md-12"> {{ $chart->content or '' }} </div>
+                </div>
+            @endif
 
             <div class="box-body">
                 <div class="row">
@@ -42,6 +63,7 @@
             </div>
 
             <div class="box-footer">
+                &nbsp;
             </div>
 
         </div>
